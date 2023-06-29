@@ -1,5 +1,6 @@
 ﻿using ASBQueueReceiver.Models;
 using Azure.Messaging.ServiceBus;
+using Newtonsoft.Json;
 
 namespace ASBQueueReceiver.Services
 {
@@ -37,6 +38,7 @@ namespace ASBQueueReceiver.Services
         async Task MessageHandler(ProcessMessageEventArgs args)
         {
             string body = args.Message.Body.ToString();
+            var data= JsonConvert.DeserializeObject<QueueMessage>(body);
             Console.WriteLine(body);
 
             _logger.LogInformation("Handler completed successfull. Acknowledging the message was processed.");
