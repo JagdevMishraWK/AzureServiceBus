@@ -12,6 +12,21 @@ builder.Services.AddSwaggerGen();
 //Background Service Dependenacy Injection
 builder.Services.AddHostedService<BackgroundServiceHandler>();
 
+builder.Services.AddSingleton<IQueueReceiverService, QueueReceiverService>();
+
+
+builder.Services.AddAzureClients(clientsBuilder =>
+{
+    string connectionString = builder.Configuration.GetSection("ServiceBus").GetValue<string>("ConnectionString");
+    clientsBuilder.AddServiceBusClient(connectionString)
+      .ConfigureOptions(options =>
+      {
+          options.RetryOptions.Delay = TimeSpan.FromMilliseconds(50);
+          options.RetryOptions.MaxDelay = TimeSpan.FromSeconds(5);
+          options.RetryOptions.MaxRetries = 3;
+      });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
